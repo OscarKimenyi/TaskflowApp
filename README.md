@@ -174,10 +174,10 @@ Create a folder called `taskflowApp` on your machine and place all the project f
 
 ```bash
 # macOS / Linux
-cd ~/Desktop/taskflow
+cd ~/Desktop/taskflowApp
 
 # Windows (PowerShell)
-cd C:\Users\YourName\Desktop\taskflow
+cd C:\Users\YourName\Desktop\taskflowApp
 ```
 
 ### Step 3 — Create a virtual environment
