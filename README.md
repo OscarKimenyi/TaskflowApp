@@ -1,6 +1,8 @@
-# TaskFlow
+# TaskFlowApp
 
 A full-stack to-do list web application built with Python and Flask. TaskFlow lets users register, log in, and manage personal task lists with priorities, categories, due dates, and completion tracking — all through a polished dark-themed web interface.
+
+![Dashboard Preview](https://res.cloudinary.com/dhyo79gy1/image/upload/v1776672727/todo_dqvzqp.png)
 
 ---
 
@@ -25,7 +27,7 @@ A full-stack to-do list web application built with Python and Flask. TaskFlow le
 
 ## Project Overview
 
-TaskFlow is a full-stack web application designed as a practical, production-quality learning project that covers all the essential pillars of modern Python web development: routing, authentication, database modeling, form validation, CSRF protection, and responsive UI design.
+TaskFlowApp is a full-stack web application designed as a practical, production-quality learning project that covers all the essential pillars of modern Python web development: routing, authentication, database modeling, form validation, CSRF protection, and responsive UI design.
 
 The codebase is clean, well-structured, and intentionally kept simple so every part is easy to understand and extend. It uses Flask as the web framework, SQLAlchemy as the ORM, SQLite as the database, and Jinja2 for server-side HTML rendering — no JavaScript frameworks required.
 
@@ -110,7 +112,7 @@ The codebase is clean, well-structured, and intentionally kept simple so every p
 ## Project Structure
 
 ```
-taskflow/
+taskflowApp/
 ├── run.py                        ← Entry point
 ├── requirements.txt              ← Python dependencies
 ├── .env                          ← Environment variables (never commit this)
@@ -166,7 +168,7 @@ python3 --version
 
 ### Step 1 — Get the project files
 
-Create a folder called `taskflow` on your machine and place all the project files inside it, maintaining the directory structure shown above.
+Create a folder called `taskflowApp` on your machine and place all the project files inside it, maintaining the directory structure shown above.
 
 ### Step 2 — Open a terminal inside the project folder
 
@@ -481,7 +483,7 @@ FLASK_DEBUG=0
 
 ```bash
 sudo apt update && sudo apt install python3 python3-pip python3-venv nginx -y
-git clone https://github.com/yourname/taskflow.git
+git clone https://github.com/OscarKimenyi/TaskflowApp.git
 cd taskflow
 python3 -m venv venv
 source venv/bin/activate
