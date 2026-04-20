@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}TaskFlow — Get things done{% endblock %}
+
+{% block content %}
+<div class="landing">
+  <div class="landing-hero">
+    <div class="hero-badge">Simple. Focused. Yours.</div>
+    <h1 class="hero-title">Stop forgetting.<br><span class="accent">Start doing.</span></h1>
+    <p class="hero-sub">A clean, fast to-do list that stays out of your way so you can focus on what actually matters.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Get started — it's free</a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-lg">Sign in</a>
+    </div>
+  </div>
+
+  <div class="landing-features">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Lightning fast</h3>
+      <p>Add, complete, and manage tasks with minimal friction.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Priority levels</h3>
+      <p>Mark tasks as low, medium, or high priority and sort your day.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🗂️</div>
+      <h3>Categories</h3>
+      <p>Organize by project, context, or whatever makes sense to you.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <h3>Due dates</h3>
+      <p>Set deadlines and get visual alerts when tasks go overdue.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — TaskFlow{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-number">{{ total }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">{{ total - completed }}</span>
+      <span class="stat-label">Pending</span>
+    </div>
+    <div class="stat stat-success">
+      <span class="stat-number">{{ completed }}</span>
+      <span class="stat-label">Done</span>
+    </div>
+    {% if overdue > 0 %}
+    <div class="stat stat-danger">
+      <span class="stat-number">{{ overdue }}</span>
+      <span class="stat-label">Overdue</span>
+    </div>
+    {% endif %}
+
+    {% if total > 0 %}
+    <div class="stat stat-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ (completed / total * 100)|int }}%"></div>
+      </div>
+      <span class="stat-label">{{ (completed / total * 100)|int }}% complete</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <form class="search-form" method="GET">
+      <input type="text" name="q" class="search-input" placeholder="Search tasks…" value="{{ search_query }}">
+      <input type="hidden" name="status" value="{{ filter_status }}">
+      <input type="hidden" name="priority" value="{{ filter_priority }}">
+      <input type="hidden" name="category" value="{{ filter_category }}">
+      <input type="hidden" name="sort" value="{{ sort_by }}">
+    </form>
+
+    <div class="filters">
+      <!-- Status filter -->
+      <div class="filter-group">
+        {% for val, label in [('all','All'), ('active','Active'), ('completed','Done')] %}
+        <a href="{{ url_for('tasks.dashboard', status=val, priority=filter_priority, category=filter_category, sort=sort_by, q=search_query) }}"
+           class="filter-btn {{ 'active' if filter_status == val }}">{{ label }}</a>
+        {% endfor %}
+      </div>
+
+      <!-- Priority filter -->
+      <select class="filter-select" onchange="applyFilter('priority', this.value)">
+        <option value="all" {{ 'selected' if filter_priority == 'all' }}>All priorities</option>
+        <option value="high" {{ 'selected' if filter_priority == 'high' }}>High</option>
+        <option value="medium" {{ 'selected' if filter_priority == 'medium' }}>Medium</option>
+        <option value="low" {{ 'selected' if filter_priority == 'low' }}>Low</option>
+      </select>
+
+      <!-- Category filter -->
+      {% if categories %}
+      <select class="filter-select" onchange="applyFilter('category', this.value)">
+        <option value="all" {{ 'selected' if filter_category == 'all' }}>All categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat }}" {{ 'selected' if filter_category == cat }}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+
+      <!-- Sort -->
+      <select class="filter-select" onchange="applyFilter('sort', this.value)">
+        <option value="created_at" {{ 'selected' if sort_by == 'created_at' }}>Newest first</option>
+        <option value="due_date" {{ 'selected' if sort_by == 'due_date' }}>Due date</option>
+        <option value="priority" {{ 'selected' if sort_by == 'priority' }}>Priority</option>
+        <option value="title" {{ 'selected' if sort_by == 'title' }}>A–Z</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Task List -->
+  <div class="task-list">
+    {% if tasks %}
+      {% for task in tasks %}
+      <div class="task-card {{ 'task-completed' if task.completed }} {{ 'task-overdue' if task.is_overdue() }}" id="task-{{ task.id }}">
+        <div class="task-left">
+          <button class="task-check {{ 'checked' if task.completed }}"
+                  onclick="toggleTask({{ task.id }})"
+                  title="Mark {{ 'incomplete' if task.completed else 'complete' }}">
+            {% if task.completed %}✓{% endif %}
+          </button>
+        </div>
+
+        <div class="task-body">
+          <div class="task-title">{{ task.title }}</div>
+          {% if task.description %}
+          <div class="task-desc">{{ task.description }}</div>
+          {% endif %}
+          <div class="task-meta">
+            <span class="priority-badge priority-{{ task.priority }}">{{ task.priority }}</span>
+            {% if task.category %}
+            <span class="category-badge">{{ task.category }}</span>
+            {% endif %}
+            {% if task.due_date %}
+            <span class="due-date {{ 'overdue-label' if task.is_overdue() }}">
+              📅 {{ task.due_date.strftime('%b %d, %Y') }}
+              {% if task.is_overdue() %} — Overdue{% endif %}
+            </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="task-actions">
+          <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" class="task-btn" title="Edit">✏️</a>
+          <form method="POST" action="{{ url_for('tasks.delete_task', task_id=task.id) }}"
+                onsubmit="return confirm('Delete this task?')" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="task-btn task-btn-delete" title="Delete">🗑️</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <h2>{{ "No tasks match your filters." if search_query or filter_status != 'all' or filter_priority != 'all' else "No tasks yet." }}</h2>
+        <p>{{ "Try adjusting your search or filters." if search_query else "Add your first task to get started." }}</p>
+        {% if not search_query %}
+        <a href="{{ url_for('tasks.new_task') }}" class="btn btn-primary">+ Create a task</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function applyFilter(param, value) {
+  const url = new URL(window.location.href);
+  url.searchParams.set(param, value);
+  window.location.href = url.toString();
+}
+
+async function toggleTask(taskId) {
+  const res = await fetch(`/tasks/${taskId}/toggle`, { method: 'POST', headers: { 'X-CSRFToken': getCsrfToken() } });
+  if (res.ok) {
+    const data = await res.json();
+    const card = document.getElementById(`task-${taskId}`);
+    const btn = card.querySelector('.task-check');
+    if (data.completed) {
+      card.classList.add('task-completed');
+      btn.classList.add('checked');
+      btn.textContent = '✓';
+    } else {
+      card.classList.remove('task-completed');
+      btn.classList.remove('checked');
+      btn.textContent = '';
+    }
+  }
+}
+
+function getCsrfToken() {
+  return document.querySelector('meta[name="csrf-token"]')?.content || '';
+}
+</script>
+{% endblock %}
